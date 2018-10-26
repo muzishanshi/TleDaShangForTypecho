@@ -37,7 +37,14 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 		//版本检查
 		$version=file_get_contents('http://api.tongleer.com/interface/TleDaShang.php?action=update&version=1');
 		$headDiv=new Typecho_Widget_Helper_Layout();
-		$headDiv->html('版本检查：'.$version);
+		$headDiv->html('版本检查：'.$version.'
+			<h6>使用方法</h6>
+			<span><p>第一步：配置下方各项参数；</p></span>
+			<span>
+				第二步：将以下代码放到主题目录下post.php中输出内容的位置进行替换（如：parseContent($this)）即可。
+				<pre>&lt;?php echo TleDaShang_Plugin::printDashang($this); ?></pre>
+			</span>
+		');
 		$headDiv->render();
 		//QQ、微信、支付宝链接设置
 		$qqUrl = new Typecho_Widget_Helper_Form_Element_Text('qqUrl', array('value'), 'https://i.qianbao.qq.com/wallet/sqrcode.htm?m=tenpay&f=wallet&u=2293338477&a=1&n=Mr.%E8%B4%B0%E5%91%86&ac=26A9D4109C10A5D5C08964FCFD5634EAC852E009B700ECDA2A064092BCF6C016', _t('QQ支付二维码url'), _t('可使用<a href="https://cli.im/deqr/" target="_blank">草料二维码</a>将二维码图片转成url地址填入其中'));
