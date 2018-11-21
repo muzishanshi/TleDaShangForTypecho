@@ -41,7 +41,7 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 			<h6>使用方法</h6>
 			<span><p>第一步：配置下方各项参数；</p></span>
 			<span>
-				第二步：将以下代码放到主题目录下post.php中输出内容的位置进行替换（如：parseContent($this)）即可。
+				第二步：将以下代码放到主题目录下post.php中合适位置（如：内容下面）即可。
 				<pre>&lt;?php echo TleDaShang_Plugin::printDashang($this); ?></pre>
 			</span>
 		');
