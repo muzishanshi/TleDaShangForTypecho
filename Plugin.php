@@ -35,7 +35,7 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 		$options = Typecho_Widget::widget('Widget_Options');
 		$plug_url = $options->pluginUrl;
 		//版本检查
-		$version=file_get_contents('http://api.tongleer.com/interface/TleDaShang.php?action=update&version=1');
+		$version=file_get_contents('https://tongleer.com/api/interface/TleDaShang.php?action=update&version=1');
 		$headDiv=new Typecho_Widget_Helper_Layout();
 		$headDiv->html('版本检查：'.$version.'
 			<h6>使用方法</h6>
@@ -54,7 +54,7 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 		$aliUrl = new Typecho_Widget_Helper_Form_Element_Text('aliUrl', array('value'), 'HTTPS://QR.ALIPAY.COM/FKX03546YRHSVIW3YUK925', _t('支付宝支付二维码url'), _t('可使用<a href="https://cli.im/deqr/" target="_blank">草料二维码</a>将二维码图片转成url地址填入其中'));
         $form->addInput($aliUrl);
 		//打赏二维码生成设置
-		$qrcodeApi = new Typecho_Widget_Helper_Form_Element_Text('qrcodeApi', array('value'), 'http://api.tongleer.com/web/?action=qrcode&url=', _t('二维码接口'), _t(''));
+		$qrcodeApi = new Typecho_Widget_Helper_Form_Element_Text('qrcodeApi', array('value'), 'https://tongleer.com/api/web/?action=qrcode&url=', _t('二维码接口'), _t(''));
         $form->addInput($qrcodeApi);
 		$qrcodeLogoType = new Typecho_Widget_Helper_Form_Element_Radio('qrcodeLogoType', array(
             'pic'=>_t('图片'),
@@ -250,7 +250,7 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 							<?php
 						}else{
 							?>
-							<a href="http://wpa.qq.com/msgrd?v=3&uin=<?=$value['dashangqq'];?>&site=qq&menu=yes" target="_blank"><img src="http://q1.qlogo.cn/g?b=qq&nk=<?=$value['dashangqq'];?>&s=100&t=<?=time();?>" /></a>
+							<a href="https://wpa.qq.com/msgrd?v=3&uin=<?=$value['dashangqq'];?>&site=qq&menu=yes" target="_blank"><img src="https://q1.qlogo.cn/g?b=qq&nk=<?=$value['dashangqq'];?>&s=100&t=<?=time();?>" /></a>
 							<?php
 						}
 					?>

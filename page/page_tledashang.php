@@ -44,7 +44,7 @@ if($operation=='show'){
 <meta name="viewport" content="width=device-width, initial-scale=0.9">
 <link href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://css.letvcdn.com/lc04_yinyue/201612/19/20/00/bootstrap.min.css">
-<link rel="alternate icon" type="image/png" href="http://www.tongleer.com/wp-content/themes/D8/img/favicon.png">
+<link rel="alternate icon" type="image/png" href="https://ws3.sinaimg.cn/large/ecabade5ly1fxpiemcap1j200s00s744.jpg">
 <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
 <body background="https://ww2.sinaimg.cn/large/a15b4afegy1fpp139ax3wj200o00g073.jpg">
 <div class="container" style="padding-top:20px;">
@@ -56,7 +56,7 @@ if($operation=='show'){
 			<div class="panel-body">
 				<center>
 					<div class="alert alert-success">
-						<a href="http://wpa.qq.com/msgrd?v=3&uin=<?=$option->tledashangqq;?>&site=qq&menu=yes" target="_blank"><img class="img-circle m-b-xs" style="border: 2px solid #1281FF; margin-left:3px; margin-right:3px;" src="https://q4.qlogo.cn/headimg_dl?dst_uin=<?=$option->tledashangqq;?>&spec=100"; width="60px" height="60px" alt="全天24小时接受打赏"><br></a>
+						<a href="https://wpa.qq.com/msgrd?v=3&uin=<?=$option->tledashangqq;?>&site=qq&menu=yes" target="_blank"><img class="img-circle m-b-xs" style="border: 2px solid #1281FF; margin-left:3px; margin-right:3px;" src="https://q4.qlogo.cn/headimg_dl?dst_uin=<?=$option->tledashangqq;?>&spec=100"; width="60px" height="60px" alt="全天24小时接受打赏"><br></a>
 						<?=$option->tledashangtalk;?>
 					</div>
 				</center>
@@ -205,7 +205,7 @@ if($operation=='show'){
 										<?php
 									}else{
 										?>
-										<a href="http://wpa.qq.com/msgrd?v=3&uin=<?=$value['dashangqq'];?>&site=qq&menu=yes" target="_blank"><img src="http://q1.qlogo.cn/g?b=qq&nk=<?=$value['dashangqq'];?>&s=100" width="50" /></a>
+										<a href="https://wpa.qq.com/msgrd?v=3&uin=<?=$value['dashangqq'];?>&site=qq&menu=yes" target="_blank"><img src="https://q1.qlogo.cn/g?b=qq&nk=<?=$value['dashangqq'];?>&s=100" width="50" /></a>
 										<?php
 									}
 								?>
