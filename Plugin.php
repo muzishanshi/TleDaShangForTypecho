@@ -75,13 +75,13 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
         ), 'scan', _t('有赞'), _t("支付渠道"));
         $form->addInput($tledashangpaytype->addRule('enum', _t(''), array('scan', 'youzan')));
 		//有赞设置
-		$tledashangyz_client_id = new Typecho_Widget_Helper_Form_Element_Text('tledashangyz_client_id', null, '', _t('有赞client_id'), _t('在<a href="https://www.youzanyun.com/" target="_blank">有赞云官网</a>授权绑定有赞微小店APP的店铺后注册的client_id'));
+		$tledashangyz_client_id = new Typecho_Widget_Helper_Form_Element_Text('tledashangyz_client_id', null, '', _t('有赞client_id'), _t('在<a href="https://www.youzanyun.com/app/sdk" target="_blank">有赞App开店</a>授权绑定有赞微小店APP的店铺后注册的client_id'));
         $form->addInput($tledashangyz_client_id);
-		$tledashangyz_client_secret = new Typecho_Widget_Helper_Form_Element_Text('tledashangyz_client_secret', null, '', _t('有赞client_secret'), _t('在<a href="https://www.youzanyun.com/" target="_blank">有赞云官网</a>授权绑定有赞微小店APP的店铺后注册的client_secret'));
+		$tledashangyz_client_secret = new Typecho_Widget_Helper_Form_Element_Text('tledashangyz_client_secret', null, '', _t('有赞client_secret'), _t('在<a href="https://www.youzanyun.com/app/sdk" target="_blank">有赞App开店</a>授权绑定有赞微小店APP的店铺后注册的client_secret'));
         $form->addInput($tledashangyz_client_secret);
-		$tledashangyz_shop_id = new Typecho_Widget_Helper_Form_Element_Text('tledashangyz_shop_id', null, '', _t('有赞授权店铺id'), _t('在<a href="https://www.youzanyun.com/" target="_blank">有赞云官网</a>授权绑定有赞微小店APP的店铺后注册的授权店铺id'));
+		$tledashangyz_shop_id = new Typecho_Widget_Helper_Form_Element_Text('tledashangyz_shop_id', null, '', _t('有赞授权店铺id'), _t('在<a href="https://www.youzanyun.com/app/sdk" target="_blank">有赞App开店</a>授权绑定有赞微小店APP的店铺后注册的授权店铺id'));
         $form->addInput($tledashangyz_shop_id);
-		$tledashangyz_redirect_url = new Typecho_Widget_Helper_Form_Element_Text('tledashangyz_redirect_url', array("value"), $plug_url.'/TleDaShang/return_url.php', _t('有赞消息推送网址'), _t('在<a href="https://www.youzanyun.com/" target="_blank">有赞云官网</a>授权绑定有赞微小店APP的店铺后注册的消息推送网址'));
+		$tledashangyz_redirect_url = new Typecho_Widget_Helper_Form_Element_Text('tledashangyz_redirect_url', array("value"), $plug_url.'/TleDaShang/return_url.php', _t('有赞消息推送网址'), _t('在<a href="https://www.youzanyun.com/app/sdk" target="_blank">有赞App开店</a>授权绑定有赞微小店APP的店铺后注册的消息推送网址'));
         $form->addInput($tledashangyz_redirect_url);
 		
 		$tledashangqrcodetype = new Typecho_Widget_Helper_Form_Element_Radio('tledashangqrcodetype', array(
