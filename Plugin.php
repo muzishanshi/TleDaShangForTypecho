@@ -3,9 +3,9 @@
  * TleDaShangForTypecho打赏插件，进入插件设置可检测版本更新。<a href="https://github.com/muzishanshi/TleDaShangForTypecho" target="_blank">Github地址</a>
  * @package TleDaShang For Typecho
  * @author 二呆
- * @version 1.0.1
+ * @version 1.0.2
  * @link http://www.tongleer.com/
- * @date 2018-10-26
+ * @date 2019-03-22
  */
 class TleDaShang_Plugin implements Typecho_Plugin_Interface{
     // 激活插件
@@ -35,7 +35,7 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 		$options = Typecho_Widget::widget('Widget_Options');
 		$plug_url = $options->pluginUrl;
 		//版本检查
-		$version=file_get_contents('https://www.tongleer.com/api/interface/TleDaShang.php?action=update&version=1');
+		$version=file_get_contents('https://www.tongleer.com/api/interface/TleDaShang.php?action=update&version=2');
 		$headDiv=new Typecho_Widget_Helper_Layout();
 		$headDiv->html('版本检查：'.$version.'
 			<h6>使用方法</h6>
@@ -267,8 +267,8 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 				</li>
 			</ul>
 		</div>
-		<script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
-		<script src="https://cdn.bootcss.com/layer/3.1.0/layer.js"></script>
+		<script src="https://libs.baidu.com/jquery/1.11.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/layer/2.3/layer.js"></script>
 		<script src="<?=$plug_url;?>/TleDaShang/js/jquery-qrcode.min.js"></script>
 		<script src="<?=$plug_url;?>/TleDaShang/js/floatingcarousel.min.js" type="text/javascript"></script>
 		<script type="text/javascript">

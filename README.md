@@ -16,8 +16,15 @@
 
 #### 与我联系：
 作者：二呆<br />
+1元入群：http://joke.tongleer.com/333.html<br />
 网站：http://www.tongleer.com/<br />
 Github：https://github.com/muzishanshi/TleDaShangForTypecho
 
 #### 更新记录：
-2018-10-26 第一版本实现
+2019-03-22
+
+	V1.0.2	修复了因cdn.bootcss.com中JS静态资源不可访问导致的js失效的问题。
+	
+2018-10-26
+	
+	V1.0.1	第一版本实现
