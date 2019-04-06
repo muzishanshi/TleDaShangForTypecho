@@ -1,12 +1,13 @@
 <?php
 /**
- * TleDaShangForTypecho打赏插件，进入插件设置可检测版本更新。<a href="https://github.com/muzishanshi/TleDaShangForTypecho" target="_blank">Github地址</a>
+ * TleDaShangForTypecho打赏插件。<a href="https://github.com/muzishanshi/TleDaShangForTypecho" target="_blank">Github地址</a>
  * @package TleDaShang For Typecho
  * @author 二呆
- * @version 1.0.2
+ * @version 1.0.3
  * @link http://www.tongleer.com/
- * @date 2019-03-22
+ * @date 2019-04-06
  */
+define('TLEDASHANG_VERSION', '3');
 class TleDaShang_Plugin implements Typecho_Plugin_Interface{
     // 激活插件
     public static function activate(){
@@ -35,16 +36,27 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 		$options = Typecho_Widget::widget('Widget_Options');
 		$plug_url = $options->pluginUrl;
 		//版本检查
-		$version=file_get_contents('https://www.tongleer.com/api/interface/TleDaShang.php?action=update&version=2');
 		$headDiv=new Typecho_Widget_Helper_Layout();
-		$headDiv->html('版本检查：'.$version.'
+		$headDiv->html('<small>
+			版本检查：<span id="versionCode"></span>
+			<script src="https://apps.bdimg.com/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+			<script>
+				$(function(){
+					$.post("'.$plug_url.'/TleDaShang/ajax/update.php",{version:'.TLEDASHANG_VERSION.'},function(data){
+						$("#versionCode").html(data);
+					});
+				});
+			</script>
 			<h6>使用方法</h6>
 			<span><p>第一步：配置下方各项参数；</p></span>
 			<span>
-				第二步：将以下代码放到主题目录下post.php中合适位置（如：内容下面）即可。
+				第二步：如果使用文章打赏的话，将以下代码放到主题目录下post.php中合适位置（如：内容下面）即可，注意：<font color="red">文章打赏不支持部分pjax无刷新网站</font>。
 				<pre>&lt;?php echo TleDaShang_Plugin::printDashang($this); ?></pre>
 			</span>
-		');
+			<span>
+				第三步：独立页面中寻找打赏记录页面即为独立打赏。
+			</span>
+		</small>');
 		$headDiv->render();
 		//QQ、微信、支付宝链接设置
 		$qqUrl = new Typecho_Widget_Helper_Form_Element_Text('qqUrl', array('value'), 'https://i.qianbao.qq.com/wallet/sqrcode.htm?m=tenpay&f=wallet&u=2293338477&a=1&n=Mr.%E8%B4%B0%E5%91%86&ac=26A9D4109C10A5D5C08964FCFD5634EAC852E009B700ECDA2A064092BCF6C016', _t('QQ支付二维码url'), _t('可使用<a href="https://cli.im/deqr/" target="_blank">草料二维码</a>将二维码图片转成url地址填入其中'));
@@ -54,7 +66,7 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 		$aliUrl = new Typecho_Widget_Helper_Form_Element_Text('aliUrl', array('value'), 'HTTPS://QR.ALIPAY.COM/FKX03546YRHSVIW3YUK925', _t('支付宝支付二维码url'), _t('可使用<a href="https://cli.im/deqr/" target="_blank">草料二维码</a>将二维码图片转成url地址填入其中'));
         $form->addInput($aliUrl);
 		//打赏二维码生成设置
-		$qrcodeApi = new Typecho_Widget_Helper_Form_Element_Text('qrcodeApi', array('value'), 'https://tongleer.com/api/web/?action=qrcode&url=', _t('二维码接口'), _t(''));
+		$qrcodeApi = new Typecho_Widget_Helper_Form_Element_Text('qrcodeApi', array('value'), 'https://www.tongleer.com/api/web/?action=qrcode&url=', _t('二维码接口'), _t(''));
         $form->addInput($qrcodeApi);
 		$qrcodeLogoType = new Typecho_Widget_Helper_Form_Element_Radio('qrcodeLogoType', array(
             'pic'=>_t('图片'),
@@ -68,34 +80,19 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
         $form->addInput($qrcodeLogoTextColor);
 		$qrcodeLogoTextSize = new Typecho_Widget_Helper_Form_Element_Text('qrcodeLogoTextSize', array('value'), '25', _t('二维码logo文本大小'), _t(''));
         $form->addInput($qrcodeLogoTextSize);
-		//有赞、三合一转账二维码支付选项
+		//payjs、三合一转账二维码支付选项
 		$tledashangpaytype = new Typecho_Widget_Helper_Form_Element_Radio('tledashangpaytype', array(
             'scan'=>_t('三合一转账二维码支付'),
-            'youzan'=>_t('有赞支付')
-        ), 'scan', _t('有赞'), _t("支付渠道"));
-        $form->addInput($tledashangpaytype->addRule('enum', _t(''), array('scan', 'youzan')));
-		//有赞设置
-		$tledashangyz_client_id = new Typecho_Widget_Helper_Form_Element_Text('tledashangyz_client_id', null, '', _t('有赞client_id'), _t('在<a href="https://www.youzanyun.com/app/sdk" target="_blank">有赞App开店</a>授权绑定有赞微小店APP的店铺后注册的client_id'));
-        $form->addInput($tledashangyz_client_id);
-		$tledashangyz_client_secret = new Typecho_Widget_Helper_Form_Element_Text('tledashangyz_client_secret', null, '', _t('有赞client_secret'), _t('在<a href="https://www.youzanyun.com/app/sdk" target="_blank">有赞App开店</a>授权绑定有赞微小店APP的店铺后注册的client_secret'));
-        $form->addInput($tledashangyz_client_secret);
-		$tledashangyz_shop_id = new Typecho_Widget_Helper_Form_Element_Text('tledashangyz_shop_id', null, '', _t('有赞授权店铺id'), _t('在<a href="https://www.youzanyun.com/app/sdk" target="_blank">有赞App开店</a>授权绑定有赞微小店APP的店铺后注册的授权店铺id'));
-        $form->addInput($tledashangyz_shop_id);
-		$tledashangyz_redirect_url = new Typecho_Widget_Helper_Form_Element_Text('tledashangyz_redirect_url', array("value"), $plug_url.'/TleDaShang/return_url.php', _t('有赞消息推送网址'), _t('在<a href="https://www.youzanyun.com/app/sdk" target="_blank">有赞App开店</a>授权绑定有赞微小店APP的店铺后注册的消息推送网址'));
-        $form->addInput($tledashangyz_redirect_url);
-		
-		$tledashangqrcodetype = new Typecho_Widget_Helper_Form_Element_Radio('tledashangqrcodetype', array(
-            'QR_TYPE_FIXED_BY_PERSON'=>_t('无金额'),
-            'QR_TYPE_NOLIMIT'=>_t('固定金额且可以重复支付'),
-			'QR_TYPE_DYNAMIC'=>_t('固定金额且只可支付一次')
-        ), 'QR_TYPE_DYNAMIC', _t('固定金额且只可支付一次'), _t("支付二维码种类"));
-        $form->addInput($tledashangqrcodetype->addRule('enum', _t(''), array('QR_TYPE_FIXED_BY_PERSON', 'QR_TYPE_NOLIMIT', 'QR_TYPE_DYNAMIC')));
-		
-		$tledashangshoptype = new Typecho_Widget_Helper_Form_Element_Radio('tledashangshoptype', array(
-            'oauth'=>_t('工具型'),
-            'self'=>_t('自用型')
-        ), 'self', _t('自用型'), _t("店铺应用种类"));
-        $form->addInput($tledashangshoptype->addRule('enum', _t(''), array('oauth', 'self')));
+            'payjs'=>_t('payjs支付')
+        ), 'scan', _t('payjs'), _t("支付渠道"));
+        $form->addInput($tledashangpaytype->addRule('enum', _t(''), array('scan', 'payjs')));
+		//payjs设置
+		$tledashang_mchid = new Typecho_Widget_Helper_Form_Element_Text('tledashang_mchid', null, '', _t('payjs商户号'), _t('在<a href="https://payjs.cn/" target="_blank">payjs官网</a>注册的商户号'));
+        $form->addInput($tledashang_mchid);
+		$tledashang_key = new Typecho_Widget_Helper_Form_Element_Text('tledashang_key', null, '', _t('payjs通信密钥'), _t('在<a href="https://payjs.cn/" target="_blank">payjs官网</a>注册的通信密钥'));
+        $form->addInput($tledashang_key);
+		$tledashang_notify_url = new Typecho_Widget_Helper_Form_Element_Text('tledashang_notify_url', array("value"), $plug_url.'/TleDaShang/notify_url.php', _t('payjs异步回调'), _t('payjs支付的异步回调地址'));
+        $form->addInput($tledashang_notify_url);
 		//打赏二维码其他设置
 		$alertmsg = new Typecho_Widget_Helper_Form_Element_Text('alertmsg', array('value'), '谢谢打赏，我会加倍努力！', _t('二维码下方文字提示'), _t(''));
         $form->addInput($alertmsg);
@@ -246,11 +243,11 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 					<?php
 						if($value['dashangqq']==0){
 							?>
-							<img src="<?=$plug_url;?>/TleDaShang/images/default.jpg" width="100" />
+							<img src="<?=$plug_url;?>/TleDaShang/images/default.jpg" style="width:80px;" />
 							<?php
 						}else{
 							?>
-							<a href="https://wpa.qq.com/msgrd?v=3&uin=<?=$value['dashangqq'];?>&site=qq&menu=yes" target="_blank"><img src="https://q1.qlogo.cn/g?b=qq&nk=<?=$value['dashangqq'];?>&s=100&t=<?=time();?>" /></a>
+							<a href="https://wpa.qq.com/msgrd?v=3&uin=<?=$value['dashangqq'];?>&site=qq&menu=yes" target="_blank"><img src="https://q1.qlogo.cn/g?b=qq&nk=<?=$value['dashangqq'];?>&s=100&t=<?=time();?>" style="width:80px;" /></a>
 							<?php
 						}
 					?>
@@ -261,12 +258,13 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 				}
 				?>
 				<li>
-					<img src="<?=$plug_url;?>/TleDaShang/images/waiting.jpg" width="100" />
+					<img src="<?=$plug_url;?>/TleDaShang/images/waiting.jpg" style="width:80px;" />
 					<div><small>等你来打赏……</small></div>
 					<div>&nbsp;</div>
 				</li>
 			</ul>
 		</div>
+		<div style="clear:both;"></div>
 		<script src="https://libs.baidu.com/jquery/1.11.1/jquery.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/layer/2.3/layer.js"></script>
 		<script src="<?=$plug_url;?>/TleDaShang/js/jquery-qrcode.min.js"></script>
@@ -284,7 +282,7 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 				if($("#carousel-responsive").css("display")=="block"){
 					$("#carousel-responsive").css("display","none");
 				}else{
-					$("#carousel-responsive").css("display","");
+					$("#carousel-responsive").css("display","block");
 				}
 			});
 			$("#btn_tle_dashang").click(function(){
@@ -321,10 +319,8 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 						dataType : 'json',
 						success : function(data) {
 							layer.close(ii);
-							if(data.type=="scan"){
-								str="<center><div>支持QQ、微信、支付宝</div><img src='"+data.qr_code+"' width='200'><div><?=$option->alertmsg;?></div></center>";
-							}else if(data.type=="youzan"){
-								str="<center><div>支持微信、支付宝</div><img src='"+data.qr_code+"'><div><a href='"+data.qr_url+"' target='_blank'>跳转支付链接</a></div><div><?=$option->alertmsg;?></div></center>";
+							if(data.status=="ok"){
+								str="<center><div>"+data.alertChannel+"</div><img src='"+data.qrcode+"' width='200'><div><?=$option->alertmsg;?></div></center>";
 							}
 							layer.confirm(str, {
 								btn: ['已打赏','后悔了'],

@@ -1,8 +1,7 @@
 <?php
 include '../../../config.inc.php';
 include_once "include/phpqrcode.php";
-require_once 'libs/youzan/YZGetTokenClient.php';
-require_once 'libs/youzan/YZTokenClient.php';
+require_once 'libs/payjs.php';
 
 $db = Typecho_Db::get();
 $prefix = $db->getPrefix();
@@ -72,44 +71,48 @@ switch($option->tledashangpaytype){
 				imagettftext($QR, $fontSize, 0, ceil(($QR_width - $fontBox[2]) / 2), $from_height, $color, $font, $string);
 				imagepng($QR, $qrcodeimg);
 			}
-			
 			$qrcode_base64_img = base64EncodeImage($qrcodeimg);
-			$json=json_encode(array("type"=>"scan","qr_code"=>$qrcode_base64_img));
+			$json=json_encode(array("status"=>"ok","alertChannel"=>"支持QQ、支付宝、微信支付","qrcode"=>$qrcode_base64_img));
 			echo $json;
 			unlink($qrcodeimg);
 			return;
 		}
-		break;
-	case "youzan":
-		$token = new YZGetTokenClient( $option->tledashangyz_client_id , $option->tledashangyz_client_secret );
-		$type = $option->tledashangshoptype;
-		$keys['kdt_id'] = $option->tledashangyz_shop_id;
-		$keys['redirect_uri'] = $option->tledashangyz_redirect_url;
-		$token=$token->get_token( $type , $keys );
-		
-		$data = array(
-			'dashangqq'   =>  $dashangqq,
-			'dashanggid'=>$dashanggid,
-			'dashangmoney'   =>  $dashangmoney,
-			'dashangmsg'     =>  $dashangmsg,
-			'dashangtime'=>date('Y-m-d H:i:s',$time)
-		);
-		$insert = $db->insert('table.tledashang_item')->rows($data);
-		$insertId = $db->query($insert);
-
-		$client = new YZTokenClient($token['access_token']);
-		$method = 'youzan.pay.qrcode.create';
-		$api_version = '3.0.0';
-		$my_params = [
-			'qr_name' => '打赏|'.$insertId,
-			'qr_price' => $dashangmoney*100,
-			'qr_type' => $option->tledashangqrcodetype,
-		];
-		$my_files = [];
-		$payqrcode=$client->post($method, $api_version, $my_params, $my_files);
-		
-		$json=json_encode(array("type"=>"youzan","qr_code"=>$payqrcode["response"]["qr_code"],"qr_url"=>$payqrcode["response"]["qr_url"]));
+		$json=json_encode(array("status"=>"fail"));
 		echo $json;
+		exit;
+		break;
+	case "payjs":
+		if($action=="submitdashang"){
+			$time=time();
+			$arr = [
+				'body' => $options->title."打赏",               // 订单标题
+				'out_trade_no' => date("YmdHis",$time) . rand(100000, 999999),       // 订单号
+				'total_fee' => $dashangmoney*100,             // 金额,单位:分
+				'attach'=>$dashangmoney// 自定义数据
+			];
+			$payjs = new Payjs($arr,$option->tledashang_mchid,$option->tledashang_key,$option->tledashang_notify_url);
+			$res = $payjs->pay();
+			$rst=json_decode($res,true);
+			if($rst["return_code"]==1){
+				$data = array(
+					'dashangnumber'   =>  $arr["out_trade_no"],
+					'dashanggid'=>$dashanggid,
+					'dashangqq'   =>  $dashangqq,
+					'dashangmoney'   =>  $dashangmoney,
+					'dashangmsg'     =>  $dashangmsg,
+					'dashangtype'     =>  "wx",
+					'dashangtime'=>date('Y-m-d H:i:s',$time)
+				);
+				$insert = $db->insert('table.tledashang_item')->rows($data);
+				$insertId = $db->query($insert);
+				$json=json_encode(array("status"=>"ok","alertChannel"=>"支持微信支付","qrcode"=>$rst["qrcode"]));
+				echo $json;
+				exit;
+			}
+		}
+		$json=json_encode(array("status"=>"fail"));
+		echo $json;
+		exit;
 		break;
 }
 

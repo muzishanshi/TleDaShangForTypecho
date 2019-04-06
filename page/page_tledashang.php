@@ -79,7 +79,7 @@ if($operation=='show'){
 							<center>
 							<div class="btn-group btn-group-justified" role="group" aria-label="...">
 								<div id="submit" class="btn btn-primary">
-									确定打赏
+									确定打赏(打赏后你的信息会展示到下方，让更多人看到！)
 									<span id="msg"></span>
 								</div>
 							</div>
@@ -162,9 +162,9 @@ if($operation=='show'){
 		}
 		$i=($page_now-1)*$page_rec<0?0:($page_now-1)*$page_rec;
 		if ($this->user->group=='administrator'){
-			$query= $this->db->select()->from('table.tledashang_item')->order('dashangtime',Typecho_Db::SORT_DESC)->order('dashangmoney',Typecho_Db::SORT_DESC)->offset($i)->limit($page_rec);
+			$query= $this->db->select()->from('table.tledashang_item')->order('dashangtime',Typecho_Db::SORT_DESC)->order('dashangtime',Typecho_Db::SORT_DESC)->offset($i)->limit($page_rec);
 		}else{
-			$query= $this->db->select()->from('table.tledashang_item')->where('table.tledashang_item.dashangstatus = ?', 'y')->order('dashangtime',Typecho_Db::SORT_DESC)->order('dashangmoney',Typecho_Db::SORT_DESC)->offset($i)->limit($page_rec);
+			$query= $this->db->select()->from('table.tledashang_item')->where('table.tledashang_item.dashangstatus = ?', 'y')->order('dashangtime',Typecho_Db::SORT_DESC)->order('dashangtime',Typecho_Db::SORT_DESC)->offset($i)->limit($page_rec);
 		}
 		$rows = $this->db->fetchAll($query);
 		?>
@@ -222,16 +222,14 @@ if($operation=='show'){
 							</td>
 							<td>
 								<?php
-								if($value['dashangtype']=='alipay'||$value['dashangtype']=='ALIPAY'){
+								if($value['dashangtype']=='alipay'){
 									echo '支付宝';
 								}else if($value['dashangtype']=='qqpay'){
 									echo 'QQ钱包';
-								}else if($value['dashangtype']=='wxpay'||$value['dashangtype']=='WEIXIN_DAIXIAO'){
+								}else if($value['dashangtype']=='wxpay'||$value['dashangtype']=='wx'){
 									echo '微信';
 								}else if($value['dashangtype']=='bank_pc'){
 									echo '网银';
-								}else{
-									echo '其他';
 								}
 								?>
 							</td>
@@ -310,7 +308,7 @@ if($operation=='show'){
 			</div>
 		</div>
 		
-		<p style="text-align:center"><br>&copy; 2018 <a href="<?=$this->options ->siteUrl();?>" target="_blank"><?php $this->options->title();?></a> and Plugin By <a href="http://www.tongleer.com" target="_blank">同乐儿</a>. All rights reserved.</p>
+		<p style="text-align:center"><br>&copy; <?=date("Y");?> <a href="<?=$this->options ->siteUrl();?>" target="_blank"><?php $this->options->title();?></a> and Plugin By <a href="http://www.tongleer.com" target="_blank">Tongleer</a>. All rights reserved.</p>
 	</div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
@@ -368,10 +366,8 @@ $(function(){
 				dataType : 'json',
 				success : function(data) {
 					layer.close(ii);
-					if(data.type=="scan"){
-						str="<center><div>支持QQ、微信、支付宝</div><img src='"+data.qr_code+"' width='200'><div><?=$option->alertmsg;?></div></center>";
-					}else if(data.type=="youzan"){
-						str="<center><div>支持微信、支付宝</div><img src='"+data.qr_code+"'><div><a href='"+data.qr_url+"' target='_blank'>跳转支付链接</a></div><div><?=$option->alertmsg;?></div></center>";
+					if(data.status=="ok"){
+						str="<center><div>"+data.alertChannel+"</div><img src='"+data.qrcode+"' width='200'><div><?=$option->alertmsg;?></div></center>";
 					}
 					layer.confirm(str, {
 						btn: ['已打赏','后悔了']
