@@ -368,6 +368,10 @@ $(function(){
 					layer.close(ii);
 					if(data.status=="ok"){
 						str="<center><div>"+data.alertChannel+"</div><img src='"+data.qrcode+"' width='200'><div><?=$option->alertmsg;?></div></center>";
+						var nowtime = Date.parse(new Date()); 
+						setCookie('paytime',nowtime,24);
+					}else{
+						str="<center><div>请求支付过程出了一点小问题，稍后重试一次吧！</div></center>";
 					}
 					layer.confirm(str, {
 						btn: ['已打赏','后悔了']
