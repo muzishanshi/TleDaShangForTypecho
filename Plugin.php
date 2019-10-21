@@ -1,9 +1,9 @@
 <?php
 /**
- * TleDaShangForTypecho打赏插件。<a href="https://github.com/muzishanshi/TleDaShangForTypecho" target="_blank">Github地址</a>
+ * TleDaShangForTypecho打赏插件，包含文章打赏和在线乞讨功能，仅供娱乐。<div class="TleDaShangUpdateSet"><br /><a href="javascript:;" title="插件因兴趣于闲暇时间所写，故会有代码不规范、不专业和bug的情况，但完美主义促使代码还说得过去，如有bug或使用问题进行反馈即可。">鼠标轻触查看备注</a>&nbsp;<a href="http://club.tongleer.com" target="_blank">论坛</a>&nbsp;<a href="https://www.tongleer.com/api/web/pay.png" target="_blank">打赏</a>&nbsp;<a href="http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=diamond0422@qq.com" target="_blank">反馈</a></div><style>.TleDaShangUpdateSet a{background: #4DABFF;padding: 5px;color: #fff;}</style>
  * @package TleDaShang For Typecho
  * @author 二呆
- * @version 1.0.3
+ * @version 1.0.3<br /><span id="TleDaShangUpdateInfo"></span><script>TleDaShangXmlHttp=new XMLHttpRequest();TleDaShangXmlHttp.open("GET","https://www.tongleer.com/api/interface/TleDaShang.php?action=update&version=3",true);TleDaShangXmlHttp.send(null);TleDaShangXmlHttp.onreadystatechange=function () {if (TleDaShangXmlHttp.readyState ==4 && TleDaShangXmlHttp.status ==200){document.getElementById("TleDaShangUpdateInfo").innerHTML=TleDaShangXmlHttp.responseText;}}</script>
  * @link http://www.tongleer.com/
  * @date 2019-04-06
  */
@@ -11,6 +11,7 @@ define('TLEDASHANG_VERSION', '3');
 class TleDaShang_Plugin implements Typecho_Plugin_Interface{
     // 激活插件
     public static function activate(){
+		Typecho_Plugin::factory('Widget_Archive')->header = array('TleDaShang_Plugin', 'header');
 		$db = Typecho_Db::get();
 		$prefix = $db->getPrefix();
 		self::createTableDashangItem($db);
@@ -37,16 +38,7 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 		$plug_url = $options->pluginUrl;
 		//版本检查
 		$headDiv=new Typecho_Widget_Helper_Layout();
-		$headDiv->html('<small>
-			版本检查：<span id="versionCode"></span>
-			<script src="https://apps.bdimg.com/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
-			<script>
-				$(function(){
-					$.post("'.$plug_url.'/TleDaShang/ajax/update.php",{version:'.TLEDASHANG_VERSION.'},function(data){
-						$("#versionCode").html(data);
-					});
-				});
-			</script>
+		$headDiv->html('
 			<h6>使用方法</h6>
 			<span><p>第一步：配置下方各项参数；</p></span>
 			<span>
@@ -58,6 +50,12 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 			</span>
 		</small>');
 		$headDiv->render();
+		
+		$isEnableJQuery = new Typecho_Widget_Helper_Form_Element_Radio('isEnableJQuery', array(
+            'y'=>_t('是'),
+            'n'=>_t('否')
+        ), 'y', _t('是否加载JQuery'), _t("用于解决jquery冲突的问题，如果主题head中自带jquery，需要选择否；如果主题中未加载jquery，则需要选择是。"));
+		$form->addInput($isEnableJQuery->addRule('enum', _t(''), array('y', 'n')));
 		//QQ、微信、支付宝链接设置
 		$qqUrl = new Typecho_Widget_Helper_Form_Element_Text('qqUrl', array('value'), 'https://i.qianbao.qq.com/wallet/sqrcode.htm?m=tenpay&f=wallet&u=2293338477&a=1&n=Mr.%E8%B4%B0%E5%91%86&ac=26A9D4109C10A5D5C08964FCFD5634EAC852E009B700ECDA2A064092BCF6C016', _t('QQ支付二维码url'), _t('可使用<a href="https://cli.im/deqr/" target="_blank">草料二维码</a>将二维码图片转成url地址填入其中'));
         $form->addInput($qqUrl);
@@ -181,6 +179,14 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 		}
 	}
 	
+	public static function header(){
+		$options = Typecho_Widget::widget('Widget_Options');
+		$option=$options->plugin('TleDaShang');
+		if($option->isEnableJQuery=="y"){
+			echo '<script src="https://libs.baidu.com/jquery/1.11.1/jquery.min.js"></script>';
+		}
+	}
+	
 	/**
      * 输出内容
      * @access public
@@ -265,7 +271,6 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 			</ul>
 		</div>
 		<div style="clear:both;"></div>
-		<script src="https://libs.baidu.com/jquery/1.11.1/jquery.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/layer/2.3/layer.js"></script>
 		<script src="<?=$plug_url;?>/TleDaShang/js/jquery-qrcode.min.js"></script>
 		<script src="<?=$plug_url;?>/TleDaShang/js/floatingcarousel.min.js" type="text/javascript"></script>
