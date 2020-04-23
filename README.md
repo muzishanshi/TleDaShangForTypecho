@@ -15,18 +15,20 @@
 第四步：完成。
 
 #### 版本推荐：
-此插件使用php5.6+Typecho正式版开发。
+此插件使用php5.6+mysql开发。
 
 #### 与我联系：
 作者：二呆
-
-1元入群：http://joke.tongleer.com/333.html
 
 网站：http://www.tongleer.com/
 
 Github：https://github.com/muzishanshi/TleDaShangForTypecho
 
 #### 更新记录：
+2020-04-23
+
+	V1.0.4	新增payjs手机端微信长按二维码支付。
+	
 2019-04-06
 
 	V1.0.3	新增payjs微信支付，可通过自己的微信直接到账银行卡，并删掉有赞支付。

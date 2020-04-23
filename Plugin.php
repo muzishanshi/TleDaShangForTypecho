@@ -3,11 +3,10 @@
  * TleDaShangForTypecho打赏插件，包含文章打赏和在线乞讨功能，仅供娱乐。<div class="TleDaShangUpdateSet"><br /><a href="javascript:;" title="插件因兴趣于闲暇时间所写，故会有代码不规范、不专业和bug的情况，但完美主义促使代码还说得过去，如有bug或使用问题进行反馈即可。">鼠标轻触查看备注</a>&nbsp;<a href="http://club.tongleer.com" target="_blank">论坛</a>&nbsp;<a href="https://www.tongleer.com/api/web/pay.png" target="_blank">打赏</a>&nbsp;<a href="http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=diamond0422@qq.com" target="_blank">反馈</a></div><style>.TleDaShangUpdateSet a{background: #4DABFF;padding: 5px;color: #fff;}</style>
  * @package TleDaShang For Typecho
  * @author 二呆
- * @version 1.0.3<br /><span id="TleDaShangUpdateInfo"></span><script>TleDaShangXmlHttp=new XMLHttpRequest();TleDaShangXmlHttp.open("GET","https://www.tongleer.com/api/interface/TleDaShang.php?action=update&version=3",true);TleDaShangXmlHttp.send(null);TleDaShangXmlHttp.onreadystatechange=function () {if (TleDaShangXmlHttp.readyState ==4 && TleDaShangXmlHttp.status ==200){document.getElementById("TleDaShangUpdateInfo").innerHTML=TleDaShangXmlHttp.responseText;}}</script>
+ * @version 1.0.4<br /><span id="TleDaShangUpdateInfo"></span><script>TleDaShangXmlHttp=new XMLHttpRequest();TleDaShangXmlHttp.open("GET","https://www.tongleer.com/api/interface/TleDaShang.php?action=update&version=4",true);TleDaShangXmlHttp.send(null);TleDaShangXmlHttp.onreadystatechange=function () {if (TleDaShangXmlHttp.readyState ==4 && TleDaShangXmlHttp.status ==200){document.getElementById("TleDaShangUpdateInfo").innerHTML=TleDaShangXmlHttp.responseText;}}</script>
  * @link http://www.tongleer.com/
- * @date 2019-04-06
+ * @date 2020-04-23
  */
-define('TLEDASHANG_VERSION', '3');
 class TleDaShang_Plugin implements Typecho_Plugin_Interface{
     // 激活插件
     public static function activate(){
@@ -56,6 +55,12 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
             'n'=>_t('否')
         ), 'y', _t('是否加载JQuery'), _t("用于解决jquery冲突的问题，如果主题head中自带jquery，需要选择否；如果主题中未加载jquery，则需要选择是。"));
 		$form->addInput($isEnableJQuery->addRule('enum', _t(''), array('y', 'n')));
+		//payjs、三合一转账二维码支付选项
+		$tledashangpaytype = new Typecho_Widget_Helper_Form_Element_Radio('tledashangpaytype', array(
+            'scan'=>_t('三合一转账二维码支付'),
+            'payjs'=>_t('payjs支付')
+        ), 'scan', _t('payjs'), _t("支付渠道"));
+        $form->addInput($tledashangpaytype->addRule('enum', _t(''), array('scan', 'payjs')));
 		//QQ、微信、支付宝链接设置
 		$qqUrl = new Typecho_Widget_Helper_Form_Element_Text('qqUrl', array('value'), 'https://i.qianbao.qq.com/wallet/sqrcode.htm?m=tenpay&f=wallet&u=2293338477&a=1&n=Mr.%E8%B4%B0%E5%91%86&ac=26A9D4109C10A5D5C08964FCFD5634EAC852E009B700ECDA2A064092BCF6C016', _t('QQ支付二维码url'), _t('可使用<a href="https://cli.im/deqr/" target="_blank">草料二维码</a>将二维码图片转成url地址填入其中'));
         $form->addInput($qqUrl);
@@ -78,12 +83,7 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
         $form->addInput($qrcodeLogoTextColor);
 		$qrcodeLogoTextSize = new Typecho_Widget_Helper_Form_Element_Text('qrcodeLogoTextSize', array('value'), '25', _t('二维码logo文本大小'), _t(''));
         $form->addInput($qrcodeLogoTextSize);
-		//payjs、三合一转账二维码支付选项
-		$tledashangpaytype = new Typecho_Widget_Helper_Form_Element_Radio('tledashangpaytype', array(
-            'scan'=>_t('三合一转账二维码支付'),
-            'payjs'=>_t('payjs支付')
-        ), 'scan', _t('payjs'), _t("支付渠道"));
-        $form->addInput($tledashangpaytype->addRule('enum', _t(''), array('scan', 'payjs')));
+		
 		//payjs设置
 		$tledashang_mchid = new Typecho_Widget_Helper_Form_Element_Text('tledashang_mchid', null, '', _t('payjs商户号'), _t('在<a href="https://payjs.cn/" target="_blank">payjs官网</a>注册的商户号'));
         $form->addInput($tledashang_mchid);
@@ -91,6 +91,8 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
         $form->addInput($tledashang_key);
 		$tledashang_notify_url = new Typecho_Widget_Helper_Form_Element_Text('tledashang_notify_url', array("value"), $plug_url.'/TleDaShang/notify_url.php', _t('payjs异步回调'), _t('payjs支付的异步回调地址'));
         $form->addInput($tledashang_notify_url);
+		$tledashang_return_url = new Typecho_Widget_Helper_Form_Element_Text('tledashang_return_url', array("value"), $plug_url.'/TleDaShang/return_url.php', _t('payjs同步回调'), _t('payjs支付的同步回调地址'));
+        $form->addInput($tledashang_return_url);
 		//打赏二维码其他设置
 		$alertmsg = new Typecho_Widget_Helper_Form_Element_Text('alertmsg', array('value'), '谢谢打赏，我会加倍努力！', _t('二维码下方文字提示'), _t(''));
         $form->addInput($alertmsg);
@@ -106,6 +108,13 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
             'n'=>_t('禁用')
         ), 'y', _t('是否开启背景歌曲'), _t("启用后打赏页面会出现歌曲"));
         $form->addInput($tledashangisaudio->addRule('enum', _t(''), array('y', 'n')));
+		$tledashangaudiovolume = new Typecho_Widget_Helper_Form_Element_Text('tledashangaudiovolume', array("value"), '0.05', _t('乞讨歌音量大小'), _t('音量大小在0-1之间'));
+        $form->addInput($tledashangaudiovolume);
+		$tledashangaudiourl = new Typecho_Widget_Helper_Form_Element_Text('tledashangaudiourl', array("value"), 'http://sf.sycdn.kuwo.cn/2560baadac5c000fc060b9ec0eab18f5/5e97233d/resource/n1/68/69/11468396.mp3', _t('乞讨歌Url'), _t('输入乞讨歌的Url地址'));
+        $form->addInput($tledashangaudiourl);
+		
+		$tledashang_ad_return = new Typecho_Widget_Helper_Form_Element_Textarea('tledashang_ad_return', array("value"), '广告位', _t('手机端同步回调页广告位'), _t('手机端同步回调页广告位广告代码'));
+        $form->addInput($tledashang_ad_return);
     }
 
     // 个人用户配置面板
@@ -233,6 +242,7 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 		.btn-dashang:link,.btn-dashang:visited,.btn-dashang:hover,.btn-dashang:active{background:#D9534F;color:#FFFFFF;}
 		.btn-ranking:link,.btn-ranking:visited,.btn-ranking:hover,.btn-ranking:active{background:#D9534F;color:#FFFFFF;}
 		</style>
+		<input type="hidden" id="url" value="<?=$obj->permalink;?>" />
 		<center>
 			<a href='javascript:void(0)' style="background:#66CC66;" class="btn-ranking" id="btn_tle_dashang_ranking" title="">赞赏排名</a>
 			<a href='javascript:void(0)' style="background:#D9534F;" id="btn_tle_dashang" class='btn-dashang' title='如果觉得该作者的文章对你有帮助，那么就小礼物走一走，随意打赏给他，您的支持将鼓励作者继续创作！'>赞赏支持</a>
@@ -291,6 +301,16 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 				}
 			});
 			$("#btn_tle_dashang").click(function(){
+				var timer;
+				var oldtime = getCookie('paytime');
+				var nowtime = Date.parse(new Date()); 
+				if((nowtime-oldtime)/1000<=10){
+					layer.msg('打赏太快，我会脸红的');
+					timer=setTimeout(function() { 
+						clearTimeout(timer);
+					},1000) 
+					return;
+				}
 				layer.confirm('<div><table><tr><td>QQ：</td><td><input id="dashangqq" type="number" placeholder="QQ号(可选)" style="width:200px;" /></td><td>&nbsp;</td></tr><tr><td>金额：</td><td><input id="dashangmoney" type="text" placeholder="打赏金额(必选)" style="width:200px;" /></td><td>元</td></tr><tr><td>留言：</td><td><input id="dashangmsg" style="width:200px;" type="text" maxLength="7" list="dashangmsgselect" placeholder="打赏留言(可选)"><datalist id="dashangmsgselect" style="display:none;"><option value="赞助站长">赞助站长</option><option value="文章写的太好了">文章写的太好了</option></datalist></td><td>&nbsp;</td></tr></table></div>', {
 				btn: ['我要打赏','不打赏了'],
 					title:'给作者打赏',
@@ -317,15 +337,28 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 						return false;
 					}
 					var ii = layer.load(2, {shade:[0.1,'#fff']});
+					var dashang_payjstype="native";
+					if(isTleDashangWeiXin()){
+						dashang_payjstype="cashier";
+					}
 					$.ajax({
 						type : "POST",
 						url : "<?php echo $plug_url.'/TleDaShang/pay.php?dashanggid='.$obj->cid;?>",
-						data : {"action":"submitdashang","dashangqq":$("#dashangqq").val(),"dashangmoney":$("#dashangmoney").val(),"dashangmsg":$("#dashangmsg").val()},
+						data : {"action":"submitdashang","dashangqq":$("#dashangqq").val(),"dashangmoney":$("#dashangmoney").val(),"dashangmsg":$("#dashangmsg").val(),"dashang_payjstype":dashang_payjstype,"url":$('#url').val()},
 						dataType : 'json',
 						success : function(data) {
 							layer.close(ii);
 							if(data.status=="ok"){
-								str="<center><div>"+data.alertChannel+"</div><img src='"+data.qrcode+"' width='200'><div><?=$option->alertmsg;?></div></center>";
+								if(data.type=="native"||data.type=="scan"){
+									str="<center><div>"+data.alertChannel+"</div><img src='"+data.qrcode+"' width='200'><div><?=$option->alertmsg;?></div></center>";
+									var nowtime = Date.parse(new Date()); 
+									setCookie('paytime',nowtime,24);
+								}else if(data.type=="cashier"){
+									open("<?=$plug_url;?>/TleDaShang/pay.php?dashanggid=<?=$obj->cid;?>&dashangqq="+$('#dashangqq').val()+"&dashangmoney="+$('#dashangmoney').val()+"&dashangmsg="+$('#dashangmsg').val()+"&dashang_payjstype="+dashang_payjstype+"&url="+$('#url').val());
+									return;
+								}
+							}else{
+								str="<center><div>请求支付过程出了一点小问题，稍后重试一次吧！</div></center>";
 							}
 							layer.confirm(str, {
 								btn: ['已打赏','后悔了'],
@@ -373,6 +406,43 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 			$(window).resize($.debounce(100, function () {
 				responsiveCarousel.update(opts);
 			}));
+			
+			function isTleDashangWeiXin(){
+				var ua = window.navigator.userAgent.toLowerCase();
+				if(ua.match(/MicroMessenger/i) == "micromessenger"){
+					return true;
+				}else{
+					return false;
+				}
+			}
+			/*Cookie操作*/
+			function clearCookie(){ 
+				var keys=document.cookie.match(/[^ =;]+(?=\=)/g); 
+				if (keys) { 
+					for (var i = keys.length; i--;) 
+					document.cookie=keys[i]+'=0;expires=' + new Date( 0).toUTCString() 
+				} 
+			}
+			function setCookie(name,value,hours){  
+				var d = new Date();
+				d.setTime(d.getTime() + hours * 3600 * 1000);
+				document.cookie = name + '=' + value + '; expires=' + d.toGMTString();
+			}
+			function getCookie(name){  
+				var arr = document.cookie.split('; ');
+				for(var i = 0; i < arr.length; i++){
+					var temp = arr[i].split('=');
+					if(temp[0] == name){
+						return temp[1];
+					}
+				}
+				return '';
+			}
+			function removeCookie(name){
+				var d = new Date();
+				d.setTime(d.getTime() - 10000);
+				document.cookie = name + '=1; expires=' + d.toGMTString();
+			}
 		/*});*/
 		</script>
 		<?php

@@ -74,7 +74,7 @@ if($operation=='show'){
 						<input type="text" id="Money" name="Money" value="1" class="form-control" required="required" placeholder="打赏金额（元）" oninput="if(value.length>4)value=value.slice(0,4)"/>
 					</div>    
 					<center>
-						<input type="hidden" name="returnurl" value="<?=$url;?>" />
+						<input type="hidden" id="returnurl" name="returnurl" value="<?=$url;?>" />
 						<p>
 							<center>
 							<div class="btn-group btn-group-justified" role="group" aria-label="...">
@@ -359,17 +359,26 @@ $(function(){
 			btn: ['我要打赏','不打赏了']
 		}, function(){
 			var ii = layer.load(2, {shade:[0.1,'#fff']});
+			var dashang_payjstype="native";
+			if(isTleDashangWeiXin()){
+				dashang_payjstype="cashier";
+			}
 			$.ajax({
 				type : "POST",
 				url : "<?php echo $plug_url.'/TleDaShang/pay.php';?>",
-				data : {"action":"submitdashang","dashangqq":$("#qq").val(),"dashangmoney":$("#Money").val(),"dashangmsg":$("#attachData").val()},
+				data : {"action":"submitdashang","dashangqq":$("#qq").val(),"dashangmoney":$("#Money").val(),"dashangmsg":$("#attachData").val(),"dashang_payjstype":dashang_payjstype,"url":$('#returnurl').val()},
 				dataType : 'json',
 				success : function(data) {
 					layer.close(ii);
 					if(data.status=="ok"){
-						str="<center><div>"+data.alertChannel+"</div><img src='"+data.qrcode+"' width='200'><div><?=$option->alertmsg;?></div></center>";
-						var nowtime = Date.parse(new Date()); 
-						setCookie('paytime',nowtime,24);
+						if(data.type=="native"||data.type=="scan"){
+							str="<center><div>"+data.alertChannel+"</div><img src='"+data.qrcode+"' width='200'><div><?=$option->alertmsg;?></div></center>";
+							var nowtime = Date.parse(new Date()); 
+							setCookie('paytime',nowtime,24);
+						}else if(data.type=="cashier"){
+							open("<?=$plug_url;?>/TleDaShang/pay.php?dashangqq="+$('#qq').val()+"&dashangmoney="+$('#Money').val()+"&dashangmsg="+$('#attachData').val()+"&dashang_payjstype="+dashang_payjstype+"&url="+$('#returnurl').val());
+							return;
+						}
 					}else{
 						str="<center><div>请求支付过程出了一点小问题，稍后重试一次吧！</div></center>";
 					}
@@ -392,6 +401,14 @@ $(function(){
 			});
 		});
 	});
+	function isTleDashangWeiXin(){
+		var ua = window.navigator.userAgent.toLowerCase();
+		if(ua.match(/MicroMessenger/i) == "micromessenger"){
+			return true;
+		}else{
+			return false;
+		}
+	}
 	/*对象转数组*/
 	function objToArray(array) {
 		var arr = []
@@ -429,12 +446,12 @@ $(function(){
 		d.setTime(d.getTime() - 10000);
 		document.cookie = name + '=1; expires=' + d.toGMTString();
 	}
-	$('#bgAudio')[0].volume = 0.01;
+	$('#bgAudio')[0].volume = <?=$option->tledashangaudiovolume;?>;
 });
 </script>
 <?php if($option->tledashangisaudio=='y'){?>
 <audio id="bgAudio" autoplay="autoplay" loop="loop" height="100" width="100">
-<source src="http://other.web.rg01.sycdn.kuwo.cn/resource/n1/66/37/904891334.mp3" type="audio/mp3" />
+<source src="<?=$option->tledashangaudiourl;?>" type="audio/mp3" />
 </audio>
 <?php }?>
 </body>
