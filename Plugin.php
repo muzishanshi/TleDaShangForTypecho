@@ -62,7 +62,7 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
         ), 'scan', _t('payjs'), _t("支付渠道"));
         $form->addInput($tledashangpaytype->addRule('enum', _t(''), array('scan', 'payjs')));
 		//QQ、微信、支付宝链接设置
-		$qqUrl = new Typecho_Widget_Helper_Form_Element_Text('qqUrl', array('value'), 'https://i.qianbao.qq.com/wallet/sqrcode.htm?m=tenpay&f=wallet&u=2293338477&a=1&n=Mr.%E8%B4%B0%E5%91%86&ac=26A9D4109C10A5D5C08964FCFD5634EAC852E009B700ECDA2A064092BCF6C016', _t('QQ支付二维码url'), _t('可使用<a href="https://cli.im/deqr/" target="_blank">草料二维码</a>将二维码图片转成url地址填入其中'));
+		$qqUrl = new Typecho_Widget_Helper_Form_Element_Text('qqUrl', array('value'), 'https://i.qianbao.qq.com/wallet/sqrcode.htm?m=tenpay&f=wallet&u=229***8477&a=1&n=Mr.%E8%B4%B0%E5%91%86&ac=26A9D4109C10A5D5C08964FCFD5634EAC852E009B700ECDA2A064092BCF6C016', _t('QQ支付二维码url'), _t('可使用<a href="https://cli.im/deqr/" target="_blank">草料二维码</a>将二维码图片转成url地址填入其中'));
         $form->addInput($qqUrl);
 		$wechatUrl = new Typecho_Widget_Helper_Form_Element_Text('wechatUrl', array('value'), 'wxp://f2f0XXfQeK36aDieMEjmveUENW16IZMdDk_c', _t('微信支付二维码url'), _t('可使用<a href="https://cli.im/deqr/" target="_blank">草料二维码</a>将二维码图片转成url地址填入其中'));
         $form->addInput($wechatUrl);
@@ -99,7 +99,7 @@ class TleDaShang_Plugin implements Typecho_Plugin_Interface{
 		$pagerec = new Typecho_Widget_Helper_Form_Element_Text('pagerec', array('value'), '10', _t('打赏列表每页记录数'), _t(''));
         $form->addInput($pagerec);
 		//独立页面打赏设置
-		$tledashangqq = new Typecho_Widget_Helper_Form_Element_Text('tledashangqq', array("value"), '2293338477', _t('QQ号'), _t('通过QQ号自动获取头像地址和联系QQ链接'));
+		$tledashangqq = new Typecho_Widget_Helper_Form_Element_Text('tledashangqq', array("value"), '229***8477', _t('QQ号'), _t('通过QQ号自动获取头像地址和联系QQ链接'));
         $form->addInput($tledashangqq);
 		$tledashangtalk = new Typecho_Widget_Helper_Form_Element_Text('tledashangtalk', array("value"), '恭喜发财', _t('想说的话'), _t('如果填写用户可看到打赏你的缘由'));
         $form->addInput($tledashangtalk);
